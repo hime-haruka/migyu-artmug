@@ -1,0 +1,234 @@
+#intro {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 16px 72px;
+  position: relative;
+}
+
+#intro .heroDeco{
+  position:absolute;
+  top: -45px;
+  left: 50%;
+  transform:translateX(-50%);
+  width:1180px;
+  height:auto;
+  z-index:5;
+}
+
+#intro .hero {
+  position: relative;
+  border-radius: 0;
+  overflow: hidden;
+  min-height: 620px;
+  margin-top: 45px;
+}
+
+#intro .heroBg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+}
+
+#intro .heroFog {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0) 40%, rgba(255,255,255,.55) 62%, rgba(255,255,255,.90) 78%, rgba(255,255,255,1) 100%);
+}
+
+#intro .heroQuote {
+  position: absolute;
+  left: 50%;
+  bottom: 120px;
+  transform: translateX(-50%);
+  width: min(860px, calc(100% - 48px));
+  text-align: center;
+  font-size: 20px;
+  line-height: 1.75;
+  letter-spacing: .01em;
+  color: #38565f;
+  text-shadow: 0 1px 0 rgba(255,255,255,.65);
+}
+
+
+#intro .about {
+  background: rgba(255,255,255,1);
+  text-align: center;
+  transform: translateY(-50px);
+}
+
+#intro .aboutTitle {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: .01em;
+  color: #38565f;
+}
+
+#intro .aboutRule {
+  width: 42px;
+  height: 1px;
+  margin: 18px auto 26px;
+  background: rgba(40,50,56,.18);
+}
+
+#intro .aboutBody {
+  width: min(720px, 100%);
+  margin: 0 auto;
+  font-size: 16px;
+  line-height: 1.4;
+  color: #38565f;
+  font-weight: 400;
+}
+
+#intro .aboutBody strong {
+  font-weight: 600;
+  color: rgba(40,50,56,.92);
+}
+
+#intro .points {
+  background: rgba(255,255,255,1);
+  padding: 0 16px;
+}
+
+#intro .accordion {
+  width: min(860px, 100%);
+  margin: 0 auto;
+}
+
+#intro .accItem {
+  border-top: 1px solid rgba(40,50,56,.12);
+  padding: 22px 0;
+}
+
+#intro .accItem:first-child {
+  border-top: 0;
+}
+
+#intro .accBtn {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  text-align: left;
+}
+
+#intro .accHead {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  min-width: 0;
+}
+
+#intro .accPoint {
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: .01em;
+  color: rgba(40,50,56,.62);
+  flex: 0 0 auto;
+}
+
+#intro .accNo {
+  font-size: 18px;
+  font-weight: 500;
+  color: rgba(40,50,56,.62);
+  flex: 0 0 auto;
+}
+
+#intro .accTitle {
+  font-size: 18px;
+  font-weight: 500;
+  color: #38565f;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#intro .accChevron {
+  width: 18px;
+  height: 18px;
+  position: relative;
+  opacity: .45;
+  flex: 0 0 auto;
+}
+
+#intro .accChevron::after {
+  width: 2px;
+  height: 12px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: opacity .2s ease;
+}
+
+#intro .accBtn[aria-expanded="true"] .accChevron::after {
+  opacity: 0;
+}
+
+#intro .accPanel {
+  height: 0;
+  overflow: hidden;
+  transition: height .28s ease;
+}
+
+#intro .accPanel__inner {
+  padding: 14px 0 0 0;
+}
+
+#intro .accDesc {
+  font-size: 16px;
+  line-height: 2.0;
+  color: rgba(40,50,56,.72);
+}
+
+#intro .heroBg{
+  position:absolute;
+  inset:0;
+  background-size:cover;
+  background-position:center 20%;
+  transform: scale(1.03);
+  animation: heroSlowZoom 5s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+#intro .accChevron{
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: .45;
+  transition: transform .22s ease, opacity .22s ease;
+}
+
+#intro .accChevron svg{
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+  display: block;
+}
+
+#intro .accBtn:hover .accChevron{
+  opacity: .7;
+}
+
+#intro .accBtn[aria-expanded="true"] .accChevron{
+  transform: rotate(180deg);
+  opacity: .8;
+}
+
+@keyframes heroSlowZoom{
+  0% { transform: scale(1.03); }
+  100% { transform: scale(1.065); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  #intro .heroBg{ animation: none; }
+}
