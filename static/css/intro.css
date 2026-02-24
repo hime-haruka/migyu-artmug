@@ -1,64 +1,132 @@
-#intro {
+#intro{
   max-width: 1180px;
   margin: 0 auto;
-  padding: 0 16px 72px;
   position: relative;
+  overflow: clip;
 }
 
-#intro .heroDeco{
-  position:absolute;
-  top: -45px;
-  left: 50%;
-  transform:translateX(-50%);
-  width:1180px;
-  height:auto;
-  z-index:5;
+#intro .introBgWide{
+  position: absolute;
+  left: 0;
+  top: 950px;
+  width: 1180px;
+  height: 2200px;
+  background-repeat: no-repeat;
+  background-size: 150%;
+  background-position: top center;
+  opacity: .09;
+  filter: blur(2px);
+  z-index: 0;
+
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0) 0%,
+    rgba(0,0,0,1) 200px,
+    rgba(0,0,0,1) 100%
+  );
+
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0) 0%,
+    rgba(0,0,0,1) 200px,
+    rgba(0,0,0,1) 100%
+  );
 }
 
-#intro .hero {
+#intro .introTopDeco{
+  width: min(1180px, 100%);
+  margin: 0 auto;
   position: relative;
-  border-radius: 0;
+  z-index: 5;
+}
+
+#intro .introTopDeco img{
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+#intro .hero,
+#intro .about,
+#intro .points{
+  position: relative;
+  z-index: 1;
+}
+
+#intro .hero{
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  position: relative;
   overflow: hidden;
-  min-height: 620px;
-  margin-top: 45px;
+  min-height: 1167px;
 }
 
-#intro .heroBg {
+#intro .heroBg{
   position: absolute;
   inset: 0;
   background-size: cover;
-  background-position: center;
+  background-position: center 22%;
+  transform: scale(1.03);
+  animation: heroSlowZoom 18s ease-in-out infinite alternate;
+  will-change: transform;
+
+  -webkit-mask-image: linear-gradient(
+  to bottom,
+  rgba(0,0,0,1) 55%,
+  rgba(0,0,0,.7) 60%,
+  rgba(0,0,0,.6) 70%,
+  rgba(0,0,0,0) 90%
+  );
+
+  mask-image: linear-gradient(
+  to bottom,
+  rgba(0,0,0,1) 55%,
+  rgba(0,0,0,.7) 60%,
+  rgba(0,0,0,.6) 70%,
+  rgba(0,0,0,0) 90%
+  );
+
+  filter: brightness(1.4);
+
 }
 
-#intro .heroFog {
+#intro .heroFog{
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,0) 40%, rgba(255,255,255,.55) 62%, rgba(255,255,255,.90) 78%, rgba(255,255,255,1) 100%);
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0) 64%,
+    rgba(255,255,255,.20) 74%,
+    rgba(255,255,255,.68) 88%,
+    rgba(255,255,255,1) 100%
+  );
 }
 
-#intro .heroQuote {
+#intro .heroQuote{
   position: absolute;
   left: 50%;
-  bottom: 120px;
+  bottom: 140px;
   transform: translateX(-50%);
   width: min(860px, calc(100% - 48px));
   text-align: center;
-  font-size: 20px;
+  font-size: 25px;
   line-height: 1.75;
   letter-spacing: .01em;
   color: #38565f;
   text-shadow: 0 1px 0 rgba(255,255,255,.65);
+  z-index: 3;
 }
 
-
-#intro .about {
-  background: rgba(255,255,255,1);
+#intro .about{
+  width: min(1180px, 100%);
+  margin: -70px auto;
+  padding: 0 16px 28px;
   text-align: center;
-  transform: translateY(-50px);
 }
 
-#intro .aboutTitle {
+#intro .aboutTitle{
   margin: 0;
   font-size: 28px;
   font-weight: 500;
@@ -66,82 +134,70 @@
   color: #38565f;
 }
 
-#intro .aboutRule {
+#intro .aboutRule{
   width: 42px;
   height: 1px;
   margin: 18px auto 26px;
   background: rgba(40,50,56,.18);
 }
 
-#intro .aboutBody {
+#intro .aboutBody{
   width: min(720px, 100%);
   margin: 0 auto;
   font-size: 16px;
-  line-height: 1.4;
+  line-height: 1.95;
   color: #38565f;
   font-weight: 400;
 }
 
-#intro .aboutBody strong {
+#intro .aboutBody strong{
   font-weight: 600;
   color: rgba(40,50,56,.92);
 }
 
-#intro .points {
-  background: rgba(255,255,255,1);
-  padding: 0 16px;
+#intro .points{
+  width: min(1180px, 100%);
+  margin: 60px auto;
+  padding: 0 16px 36px;
 }
 
-#intro .accordion {
+#intro .pointsList{
   width: min(860px, 100%);
   margin: 0 auto;
 }
 
-#intro .accItem {
+#intro .pointItem{
   border-top: 1px solid rgba(40,50,56,.12);
   padding: 22px 0;
 }
 
-#intro .accItem:first-child {
+#intro .pointItem:first-child{
   border-top: 0;
 }
 
-#intro .accBtn {
-  width: 100%;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  text-align: left;
-}
-
-#intro .accHead {
+#intro .pointHead{
   display: flex;
   align-items: baseline;
   gap: 12px;
   min-width: 0;
 }
 
-#intro .accPoint {
+#intro .pointLabel{
   font-size: 22px;
   font-weight: 500;
   letter-spacing: .01em;
-  color: rgba(40,50,56,.62);
+  color: #38565f;
   flex: 0 0 auto;
 }
 
-#intro .accNo {
+#intro .pointNo{
   font-size: 18px;
   font-weight: 500;
-  color: rgba(40,50,56,.62);
+  color: #38565f;
   flex: 0 0 auto;
 }
 
-#intro .accTitle {
+#intro .pointTitle{
   font-size: 18px;
   font-weight: 500;
   color: #38565f;
@@ -150,85 +206,14 @@
   text-overflow: ellipsis;
 }
 
-#intro .accChevron {
-  width: 18px;
-  height: 18px;
-  position: relative;
-  opacity: .45;
-  flex: 0 0 auto;
-}
-
-#intro .accChevron::after {
-  width: 2px;
-  height: 12px;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  transition: opacity .2s ease;
-}
-
-#intro .accBtn[aria-expanded="true"] .accChevron::after {
-  opacity: 0;
-}
-
-#intro .accPanel {
-  height: 0;
-  overflow: hidden;
-  transition: height .28s ease;
-}
-
-#intro .accPanel__inner {
-  padding: 14px 0 0 0;
-}
-
-#intro .accDesc {
+#intro .pointDesc{
+  margin-top: 14px;
   font-size: 16px;
-  line-height: 2.0;
-  color: rgba(40,50,56,.72);
-}
-
-#intro .heroBg{
-  position:absolute;
-  inset:0;
-  background-size:cover;
-  background-position:center 20%;
-  transform: scale(1.03);
-  animation: heroSlowZoom 5s ease-in-out infinite alternate;
-  will-change: transform;
-}
-
-#intro .accChevron{
-  width: 18px;
-  height: 18px;
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: .45;
-  transition: transform .22s ease, opacity .22s ease;
-}
-
-#intro .accChevron svg{
-  width: 16px;
-  height: 16px;
-  fill: currentColor;
-  display: block;
-}
-
-#intro .accBtn:hover .accChevron{
-  opacity: .7;
-}
-
-#intro .accBtn[aria-expanded="true"] .accChevron{
-  transform: rotate(180deg);
-  opacity: .8;
+  line-height: 1.55;
+  color: #38565f;
 }
 
 @keyframes heroSlowZoom{
-  0% { transform: scale(1.03); }
-  100% { transform: scale(1.065); }
-}
-
-@media (prefers-reduced-motion: reduce){
-  #intro .heroBg{ animation: none; }
+  0%{ transform: scale(1.03); }
+  100%{ transform: scale(1.065); }
 }

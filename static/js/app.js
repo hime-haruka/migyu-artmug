@@ -81,143 +81,48 @@ function renderIntroWithPoints(intro, points) {
   const root = document.getElementById("intro");
   if (!root) return;
 
+  const bgUrl = intro.imageUrl ? escapeHtml(intro.imageUrl) : "";
+
   const items = points
     .map((p, idx) => {
-      const panelId = `acc-panel-${idx}`;
-      const num = idx + 1;
-      const circled = ["①","②","③","④","⑤","⑥","⑦","⑧","⑨","⑩"][idx] ?? String(num);
-
+      const circled = ["①","②","③","④","⑤","⑥","⑦","⑧","⑨","⑩"][idx] ?? String(idx + 1);
       return `
-        <div class="accItem">
-          <button class="accBtn" type="button"
-            aria-expanded="false"
-            aria-controls="${panelId}">
-            <span class="accHead">
-              <span class="accPoint italiana">Point</span>
-              <span class="accNo">${circled}</span>
-              <span class="accTitle heiro">${escapeHtml(p.title)}</span>
-            </span>
-            <span class="accChevron" aria-hidden="true">
-            <svg viewBox="0 0 16 16">
-                <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
-            </svg>
-            </span>
-          </button>
-
-          <div class="accPanel" id="${panelId}" role="region" aria-hidden="true">
-            <div class="accPanel__inner">
-              <div class="accDesc paper">${nl2brHtml(p.desc)}</div>
-            </div>
+        <div class="pointItem">
+          <div class="pointHead">
+            <span class="pointLabel italiana">Point</span>
+            <span class="pointNo">${circled}</span>
+            <span class="pointTitle heiro">${escapeHtml(p.title)}</span>
           </div>
+          <div class="pointDesc paper">${nl2brHtml(p.desc)}</div>
         </div>
       `;
     })
     .join("");
 
-    root.innerHTML = `
-    <img class="heroDeco" src="./static/images/intro-top.png" alt="">
+  root.innerHTML = `
+    <div class="introBgWide" style="background-image:url('${bgUrl}')"></div>
+
+    <div class="introTopDeco">
+      <img src="./static/images/intro-top.png" alt="">
+    </div>
+
     <section class="hero">
-        <div class="heroBg" style="background-image:url('${intro.imageUrl ? escapeHtml(intro.imageUrl) : ""}')"></div>
-        <div class="heroFog"></div>
-        <div class="heroQuote heiro">${escapeHtml(intro.quote)}</div>
+      <div class="heroBg" style="background-image:url('${bgUrl}')"></div>
+      <div class="heroQuote heiro">${escapeHtml(intro.quote)}</div>
     </section>
 
     <section class="about">
-        <h2 class="aboutTitle italiana">About the Artist</h2>
-        <div class="aboutRule" aria-hidden="true"></div>
-        <div class="aboutBody paper">${sanitizeBasicHtml(intro.desc)}</div>
+      <h2 class="aboutTitle italiana">About the Artist</h2>
+      <div class="aboutRule" aria-hidden="true"></div>
+      <div class="aboutBody paper">${sanitizeBasicHtml(intro.desc)}</div>
     </section>
 
     <section class="points">
-        <div class="accordion" data-accordion>
+      <div class="pointsList">
         ${items}
-        </div>
+      </div>
     </section>
-    `;
-
-  setupAccordion(root.querySelector("[data-accordion]"), { singleOpen: true });
-}
-
-// =====================
-// Accordion
-// =====================
-function setupAccordion(container, { singleOpen = true } = {}) {
-  if (!container) return;
-
-  const buttons = Array.from(container.querySelectorAll(".accBtn"));
-
-  function close(btn, panel) {
-    btn.setAttribute("aria-expanded", "false");
-    panel.setAttribute("aria-hidden", "true");
-
-    const inner = panel.firstElementChild;
-    const start = inner.scrollHeight;
-
-    panel.style.height = start + "px";
-    panel.offsetHeight; // reflow
-    panel.style.height = "0px";
-    panel.dataset.open = "0";
-  }
-
-  function open(btn, panel) {
-    btn.setAttribute("aria-expanded", "true");
-    panel.setAttribute("aria-hidden", "false");
-
-    const inner = panel.firstElementChild;
-    panel.style.height = "0px";
-    panel.offsetHeight; // reflow
-    const target = inner.scrollHeight;
-
-    panel.style.height = target + "px";
-    panel.dataset.open = "1";
-
-    const onEnd = (e) => {
-      if (e.propertyName !== "height") return;
-      panel.removeEventListener("transitionend", onEnd);
-      if (panel.dataset.open === "1") panel.style.height = "auto";
-    };
-    panel.addEventListener("transitionend", onEnd);
-  }
-
-  buttons.forEach((btn) => {
-    const panel = document.getElementById(btn.getAttribute("aria-controls"));
-    if (!panel) return;
-
-    // init
-    panel.style.height = "0px";
-    panel.dataset.open = "0";
-
-    btn.addEventListener("click", () => {
-      const isOpen = btn.getAttribute("aria-expanded") === "true";
-
-      if (singleOpen) {
-        buttons.forEach((b) => {
-          if (b === btn) return;
-          const p = document.getElementById(b.getAttribute("aria-controls"));
-          if (p && b.getAttribute("aria-expanded") === "true") close(b, p);
-        });
-      }
-
-      if (isOpen) close(btn, panel);
-      else open(btn, panel);
-    });
-  });
-
-  window.addEventListener("resize", () => {
-    buttons.forEach((btn) => {
-      const panel = document.getElementById(btn.getAttribute("aria-controls"));
-      if (!panel) return;
-
-      if (btn.getAttribute("aria-expanded") === "true") {
-        const inner = panel.firstElementChild;
-        panel.style.height = "auto";
-        const target = inner.scrollHeight;
-        panel.style.height = target + "px";
-        panel.offsetHeight;
-        panel.style.height = "auto";
-      }
-    });
-  });
+  `;
 }
 
 // =====================
