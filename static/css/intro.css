@@ -68,9 +68,6 @@
   inset: 0;
   background-size: cover;
   background-position: center 22%;
-  transform: scale(1.03);
-  animation: heroSlowZoom 18s ease-in-out infinite alternate;
-  will-change: transform;
 
   -webkit-mask-image: linear-gradient(
   to bottom,
@@ -89,7 +86,6 @@
   );
 
   filter: brightness(1.4);
-
 }
 
 #intro .heroFog{
@@ -157,7 +153,7 @@
 
 #intro .points{
   width: min(1180px, 100%);
-  margin: 60px auto;
+  margin: 0 auto;
   padding: 0 16px 36px;
 }
 
@@ -211,9 +207,4 @@
   font-size: 16px;
   line-height: 1.55;
   color: #38565f;
-}
-
-@keyframes heroSlowZoom{
-  0%{ transform: scale(1.03); }
-  100%{ transform: scale(1.065); }
 }

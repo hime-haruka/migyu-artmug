@@ -2,8 +2,11 @@
 @import url(./font.css);
 @import url(./font.css);
 @import url(./intro.css);
+@import url(./chapters.css);
+@import url(./notice.css);
 
 main {
     max-width: 1180px;
     margin: 0 auto;
 }
+

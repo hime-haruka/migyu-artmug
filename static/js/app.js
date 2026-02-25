@@ -1,6 +1,9 @@
 // =====================
 // CSV URLs
 // =====================
+const SECTION_IMAGE_CSV =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFz4EomXDXyyN5SfiL56DmZMgrdcobq_f0YbgJfW8XenuK_ehyMr4xTUQRQaeluY-9vUb_O4rZISt5/pub?gid=676002089&single=true&output=csv";
+
 const INTRO_CSV =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFz4EomXDXyyN5SfiL56DmZMgrdcobq_f0YbgJfW8XenuK_ehyMr4xTUQRQaeluY-9vUb_O4rZISt5/pub?gid=0&single=true&output=csv";
 
@@ -8,7 +11,7 @@ const POINTS_CSV =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFz4EomXDXyyN5SfiL56DmZMgrdcobq_f0YbgJfW8XenuK_ehyMr4xTUQRQaeluY-9vUb_O4rZISt5/pub?gid=1382001230&single=true&output=csv";
 
 // =====================
-// Small helpers (app-local)
+// Small helpers
 // =====================
 async function fetchCSV(url) {
   const res = await fetch(url, { cache: "no-store" });
@@ -29,10 +32,6 @@ function nl2brHtml(plainText) {
   return escapeHtml(plainText).replace(/\n/g, "<br>");
 }
 
-/**
- * utils.js 의존성 체크 (원인 파악 쉽게)
- * - csvToObjects, toDirectDriveImage, toBool, toNum, sanitizeBasicHtml 가 있어야 함
- */
 function assertUtils() {
   const required = ["csvToObjects", "toDirectDriveImage", "toBool", "toNum", "sanitizeBasicHtml"];
   const missing = required.filter((k) => typeof window[k] !== "function");
@@ -74,14 +73,27 @@ async function loadPoints() {
     .sort((a, b) => a.order - b.order);
 }
 
+async function loadSectionImages() {
+  const text = await fetchCSV(SECTION_IMAGE_CSV);
+  const rows = csvToObjects(text);
+
+  return rows.map(r => ({
+    sectionId: r.section_id?.trim(),
+    imageUrl: toDirectDriveImage(r.image_url ?? "")
+  }));
+}
+
 // =====================
 // Render
 // =====================
-function renderIntroWithPoints(intro, points) {
+function renderIntroWithPoints(intro, points, sectionImages) {
   const root = document.getElementById("intro");
   if (!root) return;
 
-  const bgUrl = intro.imageUrl ? escapeHtml(intro.imageUrl) : "";
+  const introImageRow = sectionImages.find(s => s.sectionId === "intro");
+  const bgUrl = introImageRow?.imageUrl
+    ? escapeHtml(introImageRow.imageUrl)
+    : "";
 
   const items = points
     .map((p, idx) => {
@@ -125,14 +137,86 @@ function renderIntroWithPoints(intro, points) {
   `;
 }
 
+
+
+// =====================
+// CSV URL
+// =====================
+const NOTICE_CSV =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFz4EomXDXyyN5SfiL56DmZMgrdcobq_f0YbgJfW8XenuK_ehyMr4xTUQRQaeluY-9vUb_O4rZISt5/pub?gid=1984969816&single=true&output=csv";
+
+// =====================
+// Loader
+// =====================
+async function loadNotice() {
+  const text = await fetchCSV(NOTICE_CSV);
+  const rows = csvToObjects(text);
+
+  return rows
+    .map((r) => ({
+      order: toNum(r.order, 9999),
+      desc: r.desc ?? "",
+    }))
+    .filter((n) => (n.desc || "").trim())
+    .sort((a, b) => a.order - b.order);
+}
+
+// =====================
+// Render
+// =====================
+function renderNotice(noticeRows, sectionImages) {
+  const root = document.getElementById("notice");
+  if (!root) return;
+
+  const map = new Map(
+    (Array.isArray(sectionImages) ? sectionImages : []).map((r) => [
+      String(r.sectionId || "").trim(),
+      toDirectDriveImage(r.imageUrl || ""),
+    ])
+  );
+
+  const bgUrl = (map.get("notice") || map.get("intro") || "").trim();
+
+  const itemsHtml = (Array.isArray(noticeRows) ? noticeRows : [])
+    .map((n) => `<li class="noticeItem paper">${nl2brHtml(n.desc)}</li>`)
+    .join("");
+
+  root.innerHTML = `
+    <div class="noticeBgWide" style="${bgUrl ? `background-image:url('${escapeHtml(bgUrl)}')` : ""}"></div>
+    <div class="noticeBg" style="${bgUrl ? `background-image:url('${escapeHtml(bgUrl)}')` : ""}"></div>
+
+    <div class="noticeInner">
+      <h2 class="noticeTitle heiro">공지 사항</h2>
+      <div class="noticeRule" aria-hidden="true"></div>
+
+    <ul class="noticeList paper">
+      ${itemsHtml}
+    </ul>
+    </div>
+  `;
+}
+
+
+
 // =====================
 // Boot
 // =====================
 (async function init() {
   try {
     assertUtils();
-    const [intro, points] = await Promise.all([loadIntro(), loadPoints()]);
-    renderIntroWithPoints(intro, points);
+
+    const [intro, points, sectionImages, noticeRows] = await Promise.all([
+      loadIntro(),
+      loadPoints(),
+      loadSectionImages(),
+      loadNotice(),
+    ]);
+
+
+  renderIntroWithPoints(intro, points, sectionImages);
+  renderNotice(noticeRows, sectionImages);
+  renderChapters(sectionImages);
+  
   } catch (err) {
     console.error(err);
   }
