@@ -154,6 +154,7 @@
 #intro .points{
   width: min(1180px, 100%);
   margin: 0 auto;
+  margin-top: 90px;
   padding: 0 16px 36px;
 }
 

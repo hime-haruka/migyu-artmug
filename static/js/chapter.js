@@ -1,15 +1,15 @@
 const CHAPTER_CONFIG = [
-  { id: "notice", label: "01", title: "Notice", span: 5 },
-  { id: "scope", label: "02", title: "Scope", span: 3 },
+  { id: "notice", label: "01", title: "Notice", span: 4 },
+  { id: "scope", label: "02", title: "Scope", span: 4 },
   { id: "price", label: "03", title: "Price", span: 4 },
 
   { id: "process", label: "04", title: "Process", span: 4 },
-  { id: "form", label: "05", title: "Form", span: 3 },
-  { id: "portfolio", label: "06", title: "Portfolio", span: 5 },
+  { id: "form", label: "05", title: "Form", span: 4 },
+  { id: "portfolio", label: "06", title: "Portfolio", span: 4 },
 
   { id: "collab", label: "07", title: "Collab", span: 4 },
-  { id: "copyright", label: "08", title: "Copyright", span: 5 },
-  { id: "guide", label: "09", title: "Guide", span: 3 },
+  { id: "copyright", label: "08", title: "Copyright", span: 4 },
+  { id: "guide", label: "09", title: "Guide", span: 4 },
 ];
 
 function setCssVar(name, value) {

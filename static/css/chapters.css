@@ -274,3 +274,60 @@
 #chapters .tocItem.is-open .tocBtn{
   padding-right: 16px;
 }
+
+
+
+
+
+#chapters .tocItem{
+  --imgPosX: 50%;
+  --imgPosY: 50%;
+}
+
+#chapters .tocItem::before{
+  background-position: var(--imgPosX) var(--imgPosY);
+}
+
+#chapters .tocItem[data-id="scope"]{        /* 02 */
+  --imgPosX: 50%;
+  --imgPosY: 50%;
+}
+#chapters .tocItem[data-id="collab"]{       /* 07 */
+  --imgPosX: 50%;
+  --imgPosY: 50%;
+}
+#chapters .tocItem[data-id="copyright"]{    /* 08 */
+  --imgPosX: 50%;
+  --imgPosY: 50%;
+}
+#chapters .tocItem[data-id="guide"]{        /* 09 */
+  --imgPosX: 50%;
+  --imgPosY: 50%;
+}
+
+
+
+#chapters .tocItem[data-id="notice"]{        /* 01 */
+  --imgPosX: 62%;
+  --imgPosY: 38%;
+}
+
+#chapters .tocItem[data-id="price"]{        /* 03 */
+  --imgPosX: 60%;
+  --imgPosY: 34%;
+}
+
+#chapters .tocItem[data-id="process"]{        /* 04 */
+  --imgPosX: 58%;
+  --imgPosY: 32%;
+}
+
+#chapters .tocItem[data-id="form"]{        /* 05 */
+  --imgPosX: 60%;
+  --imgPosY: 32%;
+}
+
+#chapters .tocItem[data-id="portfolio"]{        /* 06 */
+  --imgPosX: 62%;
+  --imgPosY: 40%;
+}
