@@ -1,0 +1,165 @@
+#scope{
+  width: 1180px;
+  margin: 0 auto;
+  position: relative;
+  overflow: clip;
+  padding: 0;
+
+  --scope-bg-scale: 72%;
+  --scope-bg-x: -30px;
+  --scope-bg-y: 50%;
+
+  --scope-wide-scale: 90%;
+  --scope-wide-x: -120px;
+  --scope-wide-y: -10%;
+  --scope-wide-opacity: .07;
+}
+
+#scope .scopeBg{
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  background-repeat: no-repeat;
+  background-size: var(--scope-bg-scale) auto;
+  background-position: left var(--scope-bg-x) top var(--scope-bg-y);
+
+  -webkit-mask-image: linear-gradient(
+    to right,
+    rgba(0,0,0,1) 0%,
+    rgba(0,0,0,1) 48%,
+    rgba(0,0,0,.70) 58%,
+    rgba(0,0,0,.35) 66%,
+    rgba(0,0,0,0) 78%
+  );
+  mask-image: linear-gradient(
+    to right,
+    rgba(0,0,0,1) 0%,
+    rgba(0,0,0,1) 48%,
+    rgba(0,0,0,.70) 58%,
+    rgba(0,0,0,.35) 66%,
+    rgba(0,0,0,0) 78%
+  );
+
+  filter: brightness(1.12);
+}
+
+#scope::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+
+  background:
+    radial-gradient(760px 520px at 76% 36%,
+      rgba(255,255,255,1) 0%,
+      rgba(255,255,255,.94) 56%,
+      rgba(255,255,255,0) 78%
+    ),
+    linear-gradient(270deg,
+      rgba(255,255,255,1) 0%,
+      rgba(255,255,255,.92) 46%,
+      rgba(255,255,255,0) 72%
+    );
+}
+
+#scope .scopeBgWide{
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+
+  background-repeat: no-repeat;
+  background-size: var(--scope-wide-scale) auto;
+  background-position: right var(--scope-wide-x) top var(--scope-wide-y);
+
+  opacity: var(--scope-wide-opacity);
+  filter: blur(2px) saturate(.92) contrast(1.18);
+  mix-blend-mode: multiply;
+
+  -webkit-mask-image: linear-gradient(
+    to left,
+    rgba(0,0,0,1) 0%,
+    rgba(0,0,0,1) 52%,
+    rgba(0,0,0,.25) 64%,
+    rgba(0,0,0,0) 78%
+  );
+
+  mask-image: linear-gradient(
+    to left,
+    rgba(0,0,0,1) 0%,
+    rgba(0,0,0,1) 52%,
+    rgba(0,0,0,.25) 64%,
+    rgba(0,0,0,0) 78%
+  );
+}
+
+#scope .scopeInner{
+  position: relative;
+  z-index: 3;
+  width: 640px;
+  margin-left: auto;
+  padding: 140px 120px 140px 0;
+  text-align: center;
+}
+
+#scope .scopeTitle{
+  margin: 0;
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: .02em;
+  color: #38565f;
+  text-shadow: 0 1px 0 rgba(255,255,255,.75);
+}
+
+#scope .scopeRule{
+  width: 42px;
+  height: 1px;
+  margin: 18px auto 48px;
+  background: rgba(40,50,56,.18);
+}
+
+#scope .scopeList{
+  display: flex;
+  flex-direction: column;
+  gap: 44px;
+}
+
+#scope .specItem{
+  text-align: center;
+}
+
+#scope .specLabel{
+  display: inline-block;
+  padding: 6px 18px;
+  background: #4a6a73;
+  color: #fff;
+  font-size: 16px;
+  letter-spacing: .02em;
+  margin-bottom: 14px;
+}
+
+#scope .specDesc{
+  font-size: 20px;
+  line-height: 1.8;
+  color: #38565f;
+}
+
+#scope .specDesc small{
+  font-size: 14px;
+  opacity: .8;
+}
+
+#scope .scopeLabel {
+    width: fit-content;
+    margin: 0 auto;
+    background-color: #38565f;
+    color: #fff;
+    padding: 0 10px;
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+#scope .scopeDesc {
+    font-size: 18px;
+}

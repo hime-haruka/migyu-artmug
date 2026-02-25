@@ -1,0 +1,234 @@
+#process{
+  width: 1180px;
+  margin: 0 auto;
+  position: relative;
+  overflow: clip;
+}
+
+#process .processBgWide{
+  position: absolute;
+  left: 0;
+  top: 980px;
+  width: 1180px;
+  height: 2200px;
+  background-repeat: no-repeat;
+  background-size: 150%;
+  background-position: top center;
+  opacity: .09;
+  filter: blur(2px);
+  z-index: 0;
+
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0) 0%,
+    rgba(0,0,0,1) 220px,
+    rgba(0,0,0,1) 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0) 0%,
+    rgba(0,0,0,1) 220px,
+    rgba(0,0,0,1) 100%
+  );
+}
+
+#process .processHero,
+#process .processInner{
+  position: relative;
+  z-index: 1;
+}
+
+#process .processHero{
+  width: 1180px;
+  position: relative;
+  overflow: hidden;
+  min-height: 860px;
+}
+
+#process .processHeroBg{
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center 20%;
+
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0,0,0,1) 58%,
+    rgba(0,0,0,.7) 64%,
+    rgba(0,0,0,.55) 74%,
+    rgba(0,0,0,0) 92%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0,0,0,1) 58%,
+    rgba(0,0,0,.7) 64%,
+    rgba(0,0,0,.55) 74%,
+    rgba(0,0,0,0) 92%
+  );
+}
+
+#process .processHeroFog{
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0) 62%,
+    rgba(255,255,255,.22) 74%,
+    rgba(255,255,255,.72) 90%,
+    rgba(255,255,255,1) 100%
+  );
+}
+
+#process .processInner{
+  width: 860px;
+  margin: -140px auto 0;
+  padding: 0 0 120px;
+  text-align: center;
+}
+
+#process .processTitle{
+  margin: 0;
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: .02em;
+  color: #38565f;
+  text-shadow: 0 1px 0 rgba(255,255,255,.65);
+}
+
+#process .processHint{
+  margin-top: 14px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(56,85,95,.9);
+}
+
+#process .processRule{
+  width: 42px;
+  height: 1px;
+  margin: 18px auto 34px;
+  background: rgba(40,50,56,.18);
+}
+
+#process .processBadge{
+  display: inline-block;
+  margin: 22px auto 18px;
+  padding: 6px 18px;
+  background: #4a6a73;
+  color: #fff;
+  font-size: 16px;
+  letter-spacing: .02em;
+}
+
+#process .procSteps{
+  margin: 0 auto 26px;
+  padding: 0;
+  list-style: none;
+  width: 820px;
+  text-align: left;
+  position: relative;
+}
+
+/* 세로 라인 */
+#process .procSteps::before{
+    content:"";
+    position: absolute;
+    left: 97px;
+    top: 40px;
+    bottom: 50px;
+    width: 2px;
+    background: rgb(74,106,115);
+}
+
+#process .procStep{
+  display: grid;
+  grid-template-columns: 110px 110px 1fr;
+  column-gap: 18px;
+  align-items: start;
+  padding: 16px 0;
+}
+
+#process .procStepRail{
+  position: relative;
+  height: 100%;
+}
+
+#process .procDot{
+  position: absolute;
+  left: 98px;
+  top: 22px;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #4a6a73;
+}
+
+#process .procStepNo{
+  font-size: 22px;
+  letter-spacing: .01em;
+  color: rgba(56,85,95,.95);
+  margin-top: 8px;
+}
+
+#process .procStepTitle{
+  font-size: 18px;
+  font-weight: 500;
+  color: #38565f;
+  margin-top: 6px;
+}
+
+#process .procStepSub{
+  margin-top: 6px;
+  font-size: 17px;
+  line-height: 1.65;
+  color: rgba(56,85,95,.92);
+}
+
+#process .procDesc{
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: rgba(56,85,95,.92);
+}
+
+#process .procDesc small{
+  font-size: 12px;
+  opacity: .85;
+}
+
+#process .procNotes{
+  margin: 0 auto 14px;
+  padding: 0;
+  list-style: none;
+  width: 820px;
+  text-align: left;
+}
+
+
+
+#process .procNoteItem{
+  position: relative;
+  padding-left: 16px;
+  font-size: 14px;
+  line-height: 1.9;
+  color: rgba(56,85,95,.95);
+  font-size: 18px;
+  text-align: center;
+}
+
+#process .procNoteItem::before{
+  content: "· ";
+}
+
+#process .procStepSmall small{
+  font-size: 14px;
+}
+
+#process .procNoteMain{ display:inline; }
+#process .procNoteSmall{
+  display:block;
+  margin-left: 16px;
+  font-size: 17px;
+  line-height: 1.6;
+  color: rgba(56,85,95,.8);
+}

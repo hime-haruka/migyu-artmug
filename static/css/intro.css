@@ -156,6 +156,7 @@
   margin: 0 auto;
   margin-top: 90px;
   padding: 0 16px 36px;
+  padding-bottom: 120px;
 }
 
 #intro .pointsList{
@@ -208,4 +209,23 @@
   font-size: 16px;
   line-height: 1.55;
   color: #38565f;
+}
+
+#intro::after{
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 220px;
+  pointer-events: none;
+  z-index: 10;
+
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,.35) 35%,
+    rgba(255,255,255,.78) 70%,
+    rgba(255,255,255,1) 100%
+  );
 }

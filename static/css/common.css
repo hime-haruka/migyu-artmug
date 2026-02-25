@@ -4,9 +4,22 @@
 @import url(./intro.css);
 @import url(./chapters.css);
 @import url(./notice.css);
+@import url(./scope.css);
+@import url(./price.css);
+@import url(./process.css);
+@import url(./form.css);
+@import url(./portfolio.css);
+
+body {
+    scroll-behavior: smooth;
+}
 
 main {
     max-width: 1180px;
     margin: 0 auto;
 }
 
+html.isModalOpen,
+html.isModalOpen body{
+  overflow: hidden;
+}

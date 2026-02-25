@@ -1,0 +1,229 @@
+#form{
+  width: 1180px;
+  margin: 0 auto;
+  position: relative;
+  overflow: clip;
+  padding: 0;
+
+  --form-bg-opacity: .3;
+  --form-bg-x: 50%;
+  --form-bg-y: 50%;
+}
+
+#form .formBgTex{
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: var(--form-bg-x) var(--form-bg-y);
+
+  opacity: var(--form-bg-opacity);
+  filter: blur(2px) saturate(.92) contrast(1.15);
+}
+
+#form .formInner{
+  position: relative;
+  z-index: 2;
+  padding: 110px 120px 120px;
+  text-align: center;
+  background: rgba(255,255,255,.72);
+  backdrop-filter: blur(1px);
+}
+
+#form .formTitle{
+  margin: 0;
+  font-size: 34px;
+  font-weight: 500;
+  letter-spacing: .02em;
+  color: #38565f;
+  text-shadow: 0 1px 0 rgba(255,255,255,.75);
+}
+
+#form .formLead{
+  margin: 18px auto 0;
+  width: min(860px, 100%);
+  font-size: 16px;
+  line-height: 1.9;
+  color: #38565f;
+}
+
+#form .formRule{
+  width: 42px;
+  height: 1px;
+  margin: 22px auto 46px;
+  background: rgba(40,50,56,.18);
+}
+
+#form .formBadge{
+  display: inline-block;
+  padding: 7px 22px;
+  background: #4a6a73;
+  color: #fff;
+  font-size: 16px;
+  letter-spacing: .02em;
+  margin: 0 auto 18px;
+}
+
+#form .formList{
+  list-style: none;
+  padding: 0;
+  width: min(820px, 100%);
+  color: #38565f;
+  margin-bottom: 40px;
+  margin-left: 180px;
+}
+
+#form .formItem{
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: baseline;
+  padding: 6px 0;
+  line-height: 1.1;
+  font-size: 18px;
+}
+
+
+#form .formText{
+  width: min(720px, 100%);
+  text-align: left;
+}
+
+
+#form .formText strong{
+  font-weight: 600;
+}
+
+#form .formHint{
+  margin-left: 10px;
+  font-size: 14px;
+  opacity: .9;
+}
+
+#form .formTimeline{
+  width: min(980px, 100%);
+  margin: 0 auto;
+  padding-top: 18px;
+}
+
+#form .formTLRow{
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  column-gap: 22px;
+  align-items: start;
+  padding: 22px 0;
+}
+
+#form .formRail{
+  position: relative;
+  min-height: 100%;
+}
+
+#form .formRail::before{
+  content:"";
+  position:absolute;
+  left: 44px;
+  top: -26px;
+  bottom: -26px;
+  width: 1px;
+  background: rgb(134, 134, 134);
+}
+
+#form .formMark{
+  position: sticky;
+  top: 0;
+  width: 14px;
+  height: 14px;
+  background: #4a6a73;
+  margin: 10px auto 0;
+  transform: rotate(45deg);
+}
+
+#form .formMark.isEnd{
+  width: 18px;
+  height: 18px;
+}
+
+#form .formStep{
+  text-align: left;
+  color: #38565f;
+}
+
+#form .formStepHead{
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+#form .formStepNo{
+  font-size: 36px;
+  font-weight: 500;
+  letter-spacing: .01em;
+}
+
+#form .formStepTitle{
+  font-size: 22px;
+  font-weight: 500;
+}
+
+#form .formStepDesc{
+  margin-top: 10px;
+  font-size: 18px;
+  line-height: 1.9;
+  color: #38565f;
+}
+
+#form .formSubBox{
+  margin-top: 26px;
+  border: 1px solid rgba(40,50,56,.22);
+  padding: 22px 24px;
+}
+
+#form .formSubRow + .formSubRow{
+  margin-top: 18px;
+  padding-top: 18px;
+}
+
+#form .formSubTitle {
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: .01em;
+}
+
+#form .formSubTitle::before {
+    content: "│";
+}
+
+#form .formSubDesc{
+  margin-top: 8px;
+  font-size: 15px;
+  line-height: 1.85;
+  opacity: .92;
+}
+
+
+
+#form .formTLRow{
+  position: relative;
+}
+
+#form .formRail{
+  position: relative;
+}
+
+/* 세로 라인 */
+#form .formRail::before{
+  left: 43px;
+  top: -26px;
+  bottom: -26px;
+}
+
+#form .formMark{
+  position: absolute;
+  left: 44px;
+  top: 28px;
+  transform: translate(-50%, 0) rotate(45deg);
+  margin: 0;
+}

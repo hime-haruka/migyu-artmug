@@ -1,0 +1,148 @@
+#price{
+  width: 1180px;
+  margin: 0 auto;
+  position: relative;
+  overflow: clip;
+  padding: 0;
+
+  --price-bg-opacity: .2;
+  --price-bg-scale: 125%;
+  --price-bg-x: 52%;
+  --price-bg-y: 46%;
+
+  --left-cover: 90px;
+}
+
+#price .priceBgTex{
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: var(--price-bg-x) var(--price-bg-y);
+
+
+  opacity: var(--price-bg-opacity);
+  filter: blur(2px) saturate(.92) contrast(1.15);
+}
+
+#price .priceInner{
+  position: relative;
+  z-index: 2;
+  padding: 60px 120px 60px;
+    background-color: #fff;
+}
+
+#price .priceTitle{
+  margin: 0;
+  text-align: center;
+  font-size: 34px;
+  font-weight: 500;
+  letter-spacing: .02em;
+  color: #38565f;
+  text-shadow: 0 1px 0 rgba(255,255,255,.75);
+}
+
+#price .priceRule{
+  width: 42px;
+  height: 1px;
+  margin: 18px auto 54px;
+  background: rgba(40,50,56,.18);
+}
+
+#price .priceGroups{
+  width: 100%;
+}
+
+#price .priceGroup{
+  padding: 0 0 44px;
+}
+
+#price .priceGroup + .priceGroup{
+  margin-top: 22px;
+}
+
+#price .priceGroupHead{
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  color: #38565f;
+}
+
+#price .priceGroupEn{
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: .01em;
+}
+
+#price .priceGroupKo{
+  font-size: 14px;
+  opacity: .9;
+}
+
+#price .priceGroupRule{
+  height: 1px;
+  margin: 16px 0 18px;
+  background: rgba(40,50,56,.18);
+}
+
+#price .priceList{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#price .priceRow{
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 7px 0;
+}
+
+#price .priceLeft{
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+  color: #38565f;
+}
+
+#price .priceBullet{
+  opacity: .75;
+  flex: 0 0 auto;
+}
+
+#price .priceLabel{
+  font-size: 18px;
+  line-height: 1.55;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#price .priceDesc{
+  font-size: 14px;
+  opacity: .9;
+}
+
+#price .priceDesc small{
+  font-size: 12px;
+  opacity: .85;
+}
+
+#price .priceRight{
+  font-size: 18px;
+  color: #38565f;
+  flex: 0 0 auto;
+}
+
+#price .priceLeft.paper,
+#price .priceRight.paper,
+#price .priceLabel.paper,
+#price .priceDesc.paper{
+  background: transparent;
+  box-shadow: none;
+  border: 0;
+}
