@@ -108,7 +108,7 @@
   align-items: baseline;
   gap: 10px;
 
-  font-size: 26px;
+  font-size: 24px;
   line-height: 1.5;
   color: rgba(56,85,95,.92);
   font-weight: 700;
@@ -120,7 +120,7 @@
 }
 
 #guide .refundTime{
-  font-weight: 800;
+  font-weight: 700;
 }
 
 #guide .refundSep{
@@ -129,5 +129,6 @@
 }
 
 #guide .refundVal{
-  font-weight: 700;
+  font-weight: 500;
+  font-size: 21px;
 }
