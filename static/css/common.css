@@ -9,6 +9,9 @@
 @import url(./process.css);
 @import url(./form.css);
 @import url(./portfolio.css);
+@import url(./collab.css);
+@import url(./copyright.css);
+@import url(./policy.css);
 
 body {
     scroll-behavior: smooth;

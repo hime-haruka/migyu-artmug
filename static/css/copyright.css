@@ -1,0 +1,123 @@
+#copyright{
+  width: 1180px;
+  margin: 0 auto;
+  --copyright-wide-opacity: .06;
+}
+
+#copyright .copyrightBgWide{
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+
+  background-repeat: no-repeat;
+  background-size: 120%;
+  background-position: center;
+
+  opacity: var(--copyright-wide-opacity);
+  filter: blur(3px) saturate(.95) contrast(1.1);
+  mix-blend-mode: multiply;
+}
+
+#copyright .inner{
+  padding: 50px 30px;
+}
+
+#copyright .title{
+  margin: 0;
+  text-align: center;
+  font-size: 34px;
+  font-weight: 500;
+  letter-spacing: .02em;
+  color: #38565f;
+  text-shadow: 0 1px 0 rgba(255,255,255,.75);
+}
+
+#copyright .rule{
+  width: 42px;
+  height: 1px;
+  margin: 18px auto 56px;
+  background: rgba(40,50,56,1);
+}
+
+#copyright .tableWrap{
+  width: 100%;
+}
+
+#copyright .table{
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background: #fff;
+}
+
+#copyright .table th,
+#copyright .table td{
+  border: 2px solid rgba(54, 78, 85, 1);
+  padding: 18px 14px;
+  text-align: center;
+  vertical-align: middle;
+  color: #38565f;
+}
+
+#copyright .table thead th{
+  background: #36565f;
+  color: #fff;
+  font-size: 30px;
+  font-weight: 800;
+  padding: 22px 14px;
+  letter-spacing: .01em;
+}
+
+#copyright .table thead th:first-child{
+  width: 28%;
+}
+
+#copyright .table tbody tr:nth-child(odd) td,
+#copyright .table tbody tr:nth-child(odd) th{
+  background: #eef2f3;
+}
+
+#copyright .table tbody tr:nth-child(even) td,
+#copyright .table tbody tr:nth-child(even) th{
+  background: #ffffff;
+}
+
+#copyright .table .rowHead{
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: .01em;
+  color: #36565f;
+}
+
+#copyright .table tbody td{
+  font-size: 26px;
+  font-weight: 800;
+  color: #36565f;
+}
+
+#copyright .table tbody td small{
+  font-size: 14px;
+  font-weight: 600;
+  opacity: .85;
+}
+
+#copyright .table .mark{
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: .02em;
+  line-height: 1;
+}
+
+#copyright .table .mark.isO{
+  color: #36565f;
+}
+
+#copyright .table .mark.isX{
+  color: rgba(54, 86, 95, .72);
+}
+
+#copyright .table tbody th,
+#copyright .table tbody td{
+  padding-top: 20px;
+  padding-bottom: 20px;
+}

@@ -1031,6 +1031,325 @@ function enableSmoothAnchors() {
   });
 }
 
+
+
+
+// =====================
+// CSV URL
+// =====================
+const COLLAB_CSV =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFz4EomXDXyyN5SfiL56DmZMgrdcobq_f0YbgJfW8XenuK_ehyMr4xTUQRQaeluY-9vUb_O4rZISt5/pub?gid=1415538017&single=true&output=csv";
+
+// =====================
+// YouTube helpers
+// =====================
+function getYouTubeId(url) {
+  const s = String(url ?? "").trim();
+  if (!s) return "";
+
+  // youtu.be/<id>
+  let m = s.match(/youtu\.be\/([a-zA-Z0-9_-]{6,})/);
+  if (m) return m[1];
+
+  // youtube.com/watch?v=<id>
+  m = s.match(/[?&]v=([a-zA-Z0-9_-]{6,})/);
+  if (m) return m[1];
+
+  // youtube.com/embed/<id>
+  m = s.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]{6,})/);
+  if (m) return m[1];
+
+  // youtube.com/shorts/<id>
+  m = s.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{6,})/);
+  if (m) return m[1];
+
+  return "";
+}
+
+function getYouTubeThumb(url) {
+  const id = getYouTubeId(url);
+  if (!id) return "";
+  return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+}
+
+// =====================
+// Loader
+// =====================
+async function loadCollab() {
+  const text = await fetchCSV(COLLAB_CSV);
+  const rows = csvToObjects(text);
+
+  return rows
+    .map((r) => ({
+      order: toNum(r.order, 9999),
+      name: r.name ?? "",
+      desc: r.desc ?? "",
+      url: r.url ?? "",
+      youtube: r.youtube ?? "",
+      thumb: getYouTubeThumb(r.youtube ?? ""),
+    }))
+    .filter((c) => (c.name || "").trim())
+    .sort((a, b) => a.order - b.order);
+}
+
+// =====================
+// Render
+// =====================
+function renderCollab(collabRows, sectionImages) {
+  const root = document.getElementById("collab");
+  if (!root) return;
+
+  const map = new Map(
+    (Array.isArray(sectionImages) ? sectionImages : []).map((r) => [
+      String(r.sectionId || "").trim(),
+      toDirectDriveImage(r.imageUrl || ""),
+    ])
+  );
+
+  const bgUrl = (map.get("collab") || map.get("intro") || "").trim();
+
+  const cards = (Array.isArray(collabRows) ? collabRows : [])
+    .map((c) => {
+      const name = escapeHtml(c.name);
+      const artmug = String(c.url || "").trim();
+      const yt = String(c.youtube || "").trim();
+      const thumb = String(c.thumb || "").trim();
+
+      return `
+        <a class="collabCard" href="${escapeHtml(artmug)}" target="_blank" rel="noopener">
+          <div class="collabMedia">
+            ${ thumb
+              ? `<img class="collabThumb" src="${escapeHtml(thumb)}" alt="">`
+              : `
+                <div class="collabThumb collabThumb--empty" aria-hidden="true">
+                  <div class="collabEmptyMsg">
+                    <div class="collabEmptyTitle">이미지 준비중입니다.</div>
+                  </div>
+                </div>
+              `
+            }
+            <div class="collabMediaShade" aria-hidden="true"></div>
+          </div>
+
+          <div class="collabBody">
+            <div class="collabTop">
+              <div class="collabName heiro">${name}</div>
+              ${
+                yt
+                  ? `<button class="collabYtBtn" type="button" data-youtube="${escapeHtml(
+                      yt
+                    )}">YouTube</button>`
+                  : ``
+              }
+            </div>
+
+            <div class="collabDesc paper">${sanitizeBasicHtml(c.desc)}</div>
+          </div>
+        </a>
+      `;
+    })
+    .join("");
+
+  root.innerHTML = `
+    <div class="collabBgWide" style="${bgUrl ? `background-image:url('${escapeHtml(bgUrl)}')` : ""}"></div>
+    <div class="collabBg" style="${bgUrl ? `background-image:url('${escapeHtml(bgUrl)}')` : ""}"></div>
+
+    <div class="collabInner">
+      <h2 class="collabTitle heiro">협업 작가</h2>
+      <div class="collabRule" aria-hidden="true"></div>
+
+      <div class="collabGrid">
+        ${cards}
+      </div>
+    </div>
+  `;
+
+  root.querySelectorAll(".collabYtBtn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const url = btn.getAttribute("data-youtube") || "";
+      if (url) window.open(url, "_blank", "noopener");
+    });
+  });
+}
+
+
+
+const COPYRIGHT_CSV =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFz4EomXDXyyN5SfiL56DmZMgrdcobq_f0YbgJfW8XenuK_ehyMr4xTUQRQaeluY-9vUb_O4rZISt5/pub?gid=2121055575&single=true&output=csv";
+
+async function loadCopyright() {
+  const text = await fetchCSV(COPYRIGHT_CSV);
+  const rows = csvToObjects(text);
+  if (!rows || !rows.length) return { headers: [], body: [] };
+
+  const headers = Object.keys(rows[0]);
+  const body = rows.map((r) => headers.map((h) => (r[h] ?? "").trim()));
+
+  return { headers, body };
+}
+
+function renderCopyright(data, sectionImages) {
+  const root = document.getElementById("copyright");
+  if (!root) return;
+
+  const headers = data?.headers ?? [];
+  const body = data?.body ?? [];
+
+  const imgMap = new Map(
+    (Array.isArray(sectionImages) ? sectionImages : []).map((r) => [
+      String(r.sectionId || "").trim(),
+      toDirectDriveImage(r.imageUrl || ""),
+    ])
+  );
+
+  const wideUrl = (imgMap.get("copyright") || "").trim();
+  const wideStyle = wideUrl ? ` style="background-image:url('${escapeHtml(wideUrl)}')"` : "";
+
+  const thead = `
+    <tr>
+      ${headers.map((h) => `<th>${escapeHtml(h)}</th>`).join("")}
+    </tr>
+  `;
+
+  const tbody = body
+    .map((row) => {
+      return `
+        <tr>
+          ${row
+            .map((cell, idx) => {
+              const v = String(cell ?? "").trim();
+              const isOX = v === "O" || v === "X";
+
+              if (idx === 0) return `<th class="rowHead">${escapeHtml(v)}</th>`;
+              if (isOX) return `<td class="mark ${v === "O" ? "isO" : "isX"}">${escapeHtml(v)}</td>`;
+
+              return `<td>${sanitizeBasicHtml(v)}</td>`;
+            })
+            .join("")}
+        </tr>
+      `;
+    })
+    .join("");
+
+  root.innerHTML = `
+    <div class="copyrightBgWide"${wideStyle}></div>
+
+    <div class="inner">
+      <h2 class="title heiro">이용권 표</h2>
+      <div class="rule"></div>
+
+      <div class="tableWrap">
+        <table class="table">
+          <thead>${thead}</thead>
+          <tbody>${tbody}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+
+// =====================
+// GUIDE (last section)
+// =====================
+const GUIDE_GUIDE_CSV =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFz4EomXDXyyN5SfiL56DmZMgrdcobq_f0YbgJfW8XenuK_ehyMr4xTUQRQaeluY-9vUb_O4rZISt5/pub?gid=1798966799&single=true&output=csv";
+
+const GUIDE_REFUND_CSV =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSFz4EomXDXyyN5SfiL56DmZMgrdcobq_f0YbgJfW8XenuK_ehyMr4xTUQRQaeluY-9vUb_O4rZISt5/pub?gid=772413373&single=true&output=csv";
+
+const GUIDE_SECTION_ID = "guide";
+
+
+async function loadGuideGuides() {
+  const text = await fetchCSV(GUIDE_GUIDE_CSV);
+  const rows = csvToObjects(text);
+
+  return (rows || [])
+    .map((r) => ({
+      title: (r.title ?? "").trim(),
+      desc: (r.desc ?? "").trim(),
+    }))
+    .filter((x) => x.title || x.desc);
+}
+
+async function loadGuideRefund() {
+  const text = await fetchCSV(GUIDE_REFUND_CSV);
+  const rows = csvToObjects(text);
+
+  return (rows || [])
+    .map((r) => ({
+      time: (r.time ?? "").trim(),
+      refund: (r.refund ?? "").trim(),
+    }))
+    .filter((x) => x.time || x.refund);
+}
+
+
+function renderGuide(guides, refunds, sectionImages) {
+  const root = document.getElementById(GUIDE_SECTION_ID);
+  if (!root) return;
+
+  const imgMap = new Map(
+    (Array.isArray(sectionImages) ? sectionImages : []).map((r) => [
+      String(r.sectionId || "").trim(),
+      toDirectDriveImage(r.imageUrl || ""),
+    ])
+  );
+
+  const wideUrl = (imgMap.get(GUIDE_SECTION_ID) || "").trim();
+  const wideStyle = wideUrl
+    ? ` style="background-image:url('${escapeHtml(wideUrl)}')"`
+    : "";
+
+  const guideHtml = (Array.isArray(guides) ? guides : [])
+    .map((g) => {
+      return `
+        <div class="guideItem">
+          <div class="guideItemTitle heiro">${escapeHtml(g.title)}</div>
+          <div class="guideItemDesc paper">${sanitizeBasicHtml(g.desc)}</div>
+        </div>
+      `;
+    })
+    .join("");
+
+  const refundHtml = (Array.isArray(refunds) ? refunds : [])
+    .map((r) => {
+      return `
+        <li class="refundRow">
+          <span class="refundTime">${escapeHtml(r.time)}</span>
+          <span class="refundSep">:</span>
+          <span class="refundVal">${escapeHtml(r.refund)}</span>
+        </li>
+      `;
+    })
+    .join("");
+
+  root.innerHTML = `
+    <div class="guideBgWide"${wideStyle}></div>
+
+    <div class="guideInner">
+      <h2 class="guideTitle heiro">이용권 가이드라인 및 주의사항</h2>
+      <div class="guideRule"></div>
+
+      <div class="guideList">
+        ${guideHtml}
+      </div>
+
+      <h2 class="refundTitle heiro">환불 규정</h2>
+      <div class="refundRule"></div>
+
+      <ul class="refundList">
+        ${refundHtml}
+      </ul>
+    </div>
+  `;
+}
+
+
+
 // =====================
 // Boot
 // =====================
@@ -1038,7 +1357,7 @@ function enableSmoothAnchors() {
   try {
     assertUtils();
 
-  const [intro, points, sectionImages, noticeRows, scopeRows, priceGroups, processData, formListRows, formStepsData, portfolioRows] = await Promise.all([
+  const [intro, points, sectionImages, noticeRows, scopeRows, priceGroups, processData, formListRows, formStepsData, portfolioRows, collabRows, copyrightData, guideGuides, guideRefunds] = await Promise.all([
     loadIntro(),
     loadPoints(),
     loadSectionImages(),
@@ -1049,6 +1368,10 @@ function enableSmoothAnchors() {
     loadFormList(),
     loadFormSteps(),
     loadPortfolio(),
+    loadCollab(),
+    loadCopyright(),
+    loadGuideGuides(),
+    loadGuideRefund(),
   ]);
 
   renderIntroWithPoints(intro, points, sectionImages);
@@ -1058,6 +1381,9 @@ function enableSmoothAnchors() {
   renderProcess(processData, sectionImages);
   renderForm(formListRows, formStepsData, sectionImages);
   renderPortfolio(portfolioRows, sectionImages);
+  renderCollab(collabRows, sectionImages);
+  renderCopyright(copyrightData, sectionImages);
+  renderGuide(guideGuides, guideRefunds, sectionImages);
 
   renderChapters(sectionImages);
 
