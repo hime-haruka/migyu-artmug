@@ -270,13 +270,21 @@ async function loadPrice() {
   const rows = csvToObjects(text);
 
   const cleaned = rows
-    .map((r) => ({
-      group: (r.group ?? "").trim(),
-      small: (r.small ?? "").trim(),
-      label: (r.label ?? "").trim(),
-      desc: (r.desc ?? "").trim(),
-      price: (r.price ?? "").trim(),
-    }))
+    .map((r) => {
+      const priceText = (r.price ?? "").trim();
+      const priceValue = parsePriceToNumber(priceText);
+
+      return {
+        group: (r.group ?? "").trim(),
+        small: (r.small ?? "").trim(),
+        label: (r.label ?? "").trim(),
+        desc: (r.desc ?? "").trim(),
+        button_type: (r.button_type ?? "").trim().toLowerCase(), // checkbox | radio
+        calc_type: (r.calc_type ?? "").trim().toLowerCase(),     // add | unit
+        price: priceText,
+        priceValue,
+      };
+    })
     .filter((r) => r.group || r.label || r.price || r.desc);
 
   const groupOrder = new Map();
@@ -303,6 +311,25 @@ async function loadPrice() {
   return Array.from(groupsMap.values()).sort((a, b) => a.order - b.order);
 }
 
+function parsePriceToNumber(text) {
+  const digits = String(text || "").replace(/[^\d]/g, "");
+  if (!digits) return 0;
+  return Number(digits);
+}
+
+function formatKRW(num) {
+  const n = Number(num || 0);
+  return n.toLocaleString("ko-KR") + "원";
+}
+
+function slugifyKey(str) {
+  return String(str || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-_]/g, "");
+}
+
 // =====================
 // Render (PRICE)
 // =====================
@@ -313,7 +340,7 @@ function renderPrice(priceGroups, sectionImages) {
   const map = new Map(
     (Array.isArray(sectionImages) ? sectionImages : []).map((r) => [
       String(r.sectionId || "").trim(),
-      toDirectDriveImage(r.imageUrl || ""),
+      String(r.imageUrl || "").trim(),
     ])
   );
 
@@ -321,16 +348,45 @@ function renderPrice(priceGroups, sectionImages) {
 
   const groupsHtml = (Array.isArray(priceGroups) ? priceGroups : [])
     .map((g) => {
+      const groupKey = slugifyKey(g.group || "etc");
+      const radioName = `price-radio-${groupKey}`;
+
       const itemsHtml = (Array.isArray(g.items) ? g.items : [])
-        .map((it) => {
-          const descHtml = it.desc ? `<span class="priceDesc paper">${sanitizeBasicHtml(it.desc)}</span>` : "";
+        .map((it, idx) => {
+          const type = it.button_type === "radio" ? "radio" : "checkbox";
+          const calc = it.calc_type || "add";
+          const id = `price-${groupKey}-${idx}`;
+
+          const descHtml = it.desc
+            ? `<span class="priceDesc paper">${sanitizeBasicHtml(it.desc)}</span>`
+            : "";
+
+          const qtyHtml =
+            calc === "unit"
+              ? `<input class="priceQty" type="number" min="1" step="1" value="1" inputmode="numeric" aria-label="수량" />`
+              : "";
+
           return `
             <li class="priceRow">
-              <div class="priceLeft">
-                <span class="priceBullet">·</span>
+              <label class="priceLeft priceRowLabel">
+                <input
+                  class="priceOpt"
+                  id="${id}"
+                  type="${type}"
+                  name="${type === "radio" ? radioName : ""}"
+                  data-price="${it.priceValue || 0}"
+                  data-calc="${escapeHtml(calc)}"
+                />
+                <span class="priceMark" aria-hidden="true"></span>
+
                 <span class="priceLabel paper">${escapeHtml(it.label)}</span>
                 ${descHtml}
-              </div>
+                ${calc === "unit"
+                  ? `<input class="priceQty" type="number" min="1" step="1" value="1" inputmode="numeric" aria-label="수량" />`
+                  : ""
+                }
+              </label>
+
               <div class="priceRight paper">${escapeHtml(it.price)}</div>
             </li>
           `;
@@ -362,8 +418,63 @@ function renderPrice(priceGroups, sectionImages) {
       <div class="priceGroups">
         ${groupsHtml}
       </div>
+
+      <div class="priceEstimate">
+        <div class="priceEstimateLabel paper">예상 견적</div>
+        <div class="priceEstimateValue heiro" id="priceTotalValue">0원</div>
+        <div class="priceEstimateNote paper">※ 선택 항목 기준으로 단순 합산된 금액입니다.</div>
+      </div>
     </div>
   `;
+
+  bindPriceEstimator(root);
+  updatePriceEstimator(root);
+}
+
+function bindPriceEstimator(root) {
+  root.addEventListener("change", (e) => {
+    if (e.target && (e.target.classList.contains("priceOpt") || e.target.classList.contains("priceQty"))) {
+      updatePriceEstimator(root);
+    }
+  });
+
+  root.addEventListener("input", (e) => {
+    if (e.target && e.target.classList.contains("priceQty")) {
+      updatePriceEstimator(root);
+    }
+  });
+
+  root.addEventListener("focusin", (e) => {
+    if (e.target && e.target.classList.contains("priceQty")) {
+      const row = e.target.closest(".priceRowLabel");
+      const opt = row ? row.querySelector(".priceOpt") : null;
+      if (opt && !opt.checked) {
+        opt.checked = true;
+        updatePriceEstimator(root);
+      }
+    }
+  });
+}
+function updatePriceEstimator(root) {
+  const checked = Array.from(root.querySelectorAll(".priceOpt:checked"));
+  let total = 0;
+
+  for (const opt of checked) {
+    const price = Number(opt.dataset.price || 0);
+    const calc = String(opt.dataset.calc || "add");
+
+    if (calc === "unit") {
+      const row = opt.closest(".priceRow");
+      const qtyEl = row ? row.querySelector(".priceQty") : null;
+      const qty = Math.max(1, Number(qtyEl?.value || 1));
+      total += price * qty;
+    } else {
+      total += price;
+    }
+  }
+
+  const out = root.querySelector("#priceTotalValue");
+  if (out) out.textContent = formatKRW(total);
 }
 
 
@@ -1098,6 +1209,15 @@ async function loadCollab() {
 // =====================
 // Render
 // =====================
+function splitYouTubeLinks(cell) {
+  const s = String(cell ?? "").trim();
+  if (!s) return [];
+  return s
+    .split(/\s+\/\s+/g)
+    .map(x => x.trim())
+    .filter(Boolean);
+}
+
 function renderCollab(collabRows, sectionImages) {
   const root = document.getElementById("collab");
   if (!root) return;
@@ -1108,50 +1228,73 @@ function renderCollab(collabRows, sectionImages) {
       toDirectDriveImage(r.imageUrl || ""),
     ])
   );
-
   const bgUrl = (map.get("collab") || map.get("intro") || "").trim();
 
-  const cards = (Array.isArray(collabRows) ? collabRows : [])
-    .map((c) => {
-      const name = escapeHtml(c.name);
-      const artmug = String(c.url || "").trim();
-      const yt = String(c.youtube || "").trim();
-      const thumb = String(c.thumb || "").trim();
+  const itemsHtml = (Array.isArray(collabRows) ? collabRows : []).map((c, idx) => {
+    const name = escapeHtml(c.name || "");
+    const desc = sanitizeBasicHtml(c.desc || "");
+    const artmug = String(c.url || "").trim();
 
+    const ytLinks = splitYouTubeLinks(c.youtube);
+    const vids = ytLinks.map((url) => {
+      const thumb = getYouTubeThumb(url);
       return `
-        <a class="collabCard" href="${escapeHtml(artmug)}" target="_blank" rel="noopener">
-          <div class="collabMedia">
-            ${ thumb
-              ? `<img class="collabThumb" src="${escapeHtml(thumb)}" alt="">`
-              : `
-                <div class="collabThumb collabThumb--empty" aria-hidden="true">
-                  <div class="collabEmptyMsg">
-                    <div class="collabEmptyTitle">이미지 준비중입니다.</div>
-                  </div>
-                </div>
-              `
+        <button class="collabVid" type="button" data-youtube="${escapeHtml(url)}">
+          <span class="collabVidMedia">
+            ${thumb
+              ? `<img class="collabVidThumb" src="${escapeHtml(thumb)}" alt="">`
+              : `<span class="collabVidThumb collabVidThumb--empty"></span>`
             }
-            <div class="collabMediaShade" aria-hidden="true"></div>
-          </div>
-
-          <div class="collabBody">
-            <div class="collabTop">
-              <div class="collabName heiro">${name}</div>
-              ${
-                yt
-                  ? `<button class="collabYtBtn" type="button" data-youtube="${escapeHtml(
-                      yt
-                    )}">YouTube</button>`
-                  : ``
-              }
-            </div>
-
-            <div class="collabDesc paper">${sanitizeBasicHtml(c.desc)}</div>
-          </div>
-        </a>
+            <span class="collabVidShade" aria-hidden="true"></span>
+            <span class="collabVidPlay" aria-hidden="true"></span>
+          </span>
+        </button>
       `;
-    })
-    .join("");
+    }).join("");
+
+    const hasVids = vids.length > 0;
+
+    return `
+      <div class="collabItem" data-idx="${idx}">
+        <button class="collabHead" type="button" aria-expanded="false">
+          <span class="collabHeadTitle">
+            <span class="collabName heiro">${name}</span>
+            <span class="collabSub paper">${stripHtmlToText(c.desc || "")}</span>
+          </span>
+
+          <a class="collabGo" href="${escapeHtml(artmug)}" target="_blank" rel="noopener">
+            아트머그로 이동
+          </a>
+
+          <span class="collabChevron" aria-hidden="true"></span>
+        </button>
+
+        <div class="collabPanel">
+          <div class="collabPanelInner">
+            <div class="collabDesc paper">${desc}</div>
+
+            ${
+              hasVids
+                ? `
+                  <div class="collabVideoBlock">
+                    <div class="collabVideoWrap" data-slider="1">
+                      <button class="collabNav collabNavPrev" type="button" aria-label="prev" hidden>‹</button>
+                      <div class="collabRail">
+                        <div class="collabTrack">
+                          ${vids}
+                        </div>
+                      </div>
+                      <button class="collabNav collabNavNext" type="button" aria-label="next" hidden>›</button>
+                    </div>
+                  </div>
+                `
+                : ``
+            }
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
 
   root.innerHTML = `
     <div class="collabBgWide" style="${bgUrl ? `background-image:url('${escapeHtml(bgUrl)}')` : ""}"></div>
@@ -1161,23 +1304,115 @@ function renderCollab(collabRows, sectionImages) {
       <h2 class="collabTitle heiro">협업 작가</h2>
       <div class="collabRule" aria-hidden="true"></div>
 
-      <div class="collabGrid">
-        ${cards}
+      <div class="collabAcc">
+        ${itemsHtml}
       </div>
     </div>
   `;
 
+  // ===== accordion =====
+  const items = root.querySelectorAll(".collabItem");
+  const closeItem = (item) => {
+    const head = item.querySelector(".collabHead");
+    head?.setAttribute("aria-expanded", "false");
+    item.classList.remove("is-open");
+  };
+
+  const openItem = (item) => {
+    const head = item.querySelector(".collabHead");
+    head?.setAttribute("aria-expanded", "true");
+    item.classList.add("is-open");
+    setupCollabSliders(item);
+  };
+
+  items.forEach((item) => {
+    const head = item.querySelector(".collabHead");
+    head?.addEventListener("click", () => {
+      const isOpen = item.classList.contains("is-open");
+      items.forEach(closeItem);
+      if (!isOpen) openItem(item);
+    });
+  });
+
+  // ===== video modal binding =====
   bindCollabVideoModalEventsOnce();
 
-  root.querySelectorAll(".collabYtBtn").forEach((btn) => {
+  root.querySelectorAll(".collabVid").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
-
       const url = btn.getAttribute("data-youtube") || "";
       if (url) openCollabVideoModal(url);
     });
   });
+
+function setupCollabSliders(scopeEl) {
+  const wraps = scopeEl.querySelectorAll(".collabVideoWrap[data-slider='1']");
+  wraps.forEach((wrap) => {
+    const rail = wrap.querySelector(".collabRail");
+    const track = wrap.querySelector(".collabTrack");
+    const prev = wrap.querySelector(".collabNavPrev");
+    const next = wrap.querySelector(".collabNavNext");
+    if (!rail || !track || !prev || !next) return;
+
+    const update = () => {
+      const maxScroll = Math.max(0, rail.scrollWidth - rail.clientWidth);
+
+      const canScroll = maxScroll > 2;
+      wrap.classList.toggle("is-slider", canScroll);
+      prev.hidden = !canScroll;
+      next.hidden = !canScroll;
+
+      const x = rail.scrollLeft;
+      prev.toggleAttribute("disabled", x <= 2);
+      next.toggleAttribute("disabled", x >= maxScroll - 2);
+    };
+
+    const step = () => {
+      const first = track.querySelector(".collabVid");
+      if (!first) return rail.clientWidth;
+      const cardW = first.getBoundingClientRect().width;
+
+      const second = first.nextElementSibling;
+      let gap = 12;
+      if (second) {
+        const a = first.getBoundingClientRect();
+        const b = second.getBoundingClientRect();
+        gap = Math.max(0, b.left - a.right);
+      }
+      return Math.round(cardW + gap);
+    };
+
+    const go = (dir) => {
+      rail.scrollBy({ left: dir * step(), behavior: "smooth" });
+    };
+
+    prev.addEventListener("click", (e) => {
+      e.preventDefault(); e.stopPropagation();
+      go(-1);
+    });
+    next.addEventListener("click", (e) => {
+      e.preventDefault(); e.stopPropagation();
+      go(1);
+    });
+
+    rail.addEventListener("scroll", update, { passive: true });
+
+    const ro = new ResizeObserver(update);
+    ro.observe(rail);
+
+    requestAnimationFrame(update);
+  });
+}
+}
+
+function stripHtmlToText(html) {
+  const s = String(html ?? "");
+  return s
+    .replace(/<br\s*\/?>/gi, " ")
+    .replace(/<[^>]*>/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 
