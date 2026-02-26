@@ -762,6 +762,8 @@ function bindPortfolioModalEventsOnce() {
   });
 }
 
+
+
 // ===== Render =====
 function renderPortfolio(rows, sectionImages) {
   const root = document.getElementById("portfolio");
@@ -775,7 +777,6 @@ function renderPortfolio(rows, sectionImages) {
       toDirectDriveImage(r.imageUrl || ""),
     ])
   );
-
   const bgUrl = (map.get("portfolio") || map.get("intro") || "").trim();
 
   const groups = new Map();
@@ -786,22 +787,16 @@ function renderPortfolio(rows, sectionImages) {
   }
   const groupList = [...groups.values()].sort((a, b) => a.groupOrder - b.groupOrder);
 
-  const navHtml = groupList
-    .map((g, idx) => {
-      const id = `pf-${idx + 1}`;
-      return `<a class="pfNavBtn heiro" href="#${id}">${escapeHtml(g.group)}</a>`;
-    })
-    .join("");
-
   const bodyHtml = groupList
     .map((g, idx) => {
-      const id = `pf-${idx + 1}`;
+      const gid = `pfAcc-${idx + 1}`;
+
       const items = g.items
         .map((it) => {
           const full = escapeHtml(it.imageUrl);
           const alt = escapeHtml(`${g.group} ${it.order}`);
           return `
-            <figure class="pfCard">
+            <figure class="pfRow">
               <button class="pfBtn" type="button" data-full="${full}" aria-label="${alt}">
                 <img class="pfImg" src="${full}" alt="${alt}" loading="lazy" decoding="async">
               </button>
@@ -811,13 +806,17 @@ function renderPortfolio(rows, sectionImages) {
         .join("");
 
       return `
-        <section class="pfGroup" id="${id}">
-          <div class="pfGroupHead">
-            <h3 class="pfGroupTitle heiro">${escapeHtml(g.group)}</h3>
-            <div class="pfGroupRule" aria-hidden="true"></div>
-          </div>
-          <div class="pfMasonry">
-            ${items}
+        <section class="pfAcc ${idx === 0 ? "isOpen" : ""}" data-acc="${gid}">
+          <button class="pfAccHead" type="button" aria-expanded="${idx === 0 ? "true" : "false"}">
+            <span class="pfAccTitle heiro">${escapeHtml(g.group)}</span>
+            <span class="pfAccMeta">${g.items.length}</span>
+            <span class="pfAccIcon" aria-hidden="true"></span>
+          </button>
+
+          <div class="pfAccPanel" role="region">
+            <div class="pfAccBody">
+              ${items}
+            </div>
           </div>
         </section>
       `;
@@ -826,13 +825,11 @@ function renderPortfolio(rows, sectionImages) {
 
   root.innerHTML = `
     <div class="pfBgWide" style="${bgUrl ? `background-image:url('${escapeHtml(bgUrl)}')` : ""}"></div>
-    <div class="pfBg" style="${bgUrl ? `background-image:url('${escapeHtml(bgUrl)}')` : ""}"></div>
 
     <div class="pfInner">
       <div class="pfHead">
         <h2 class="pfTitle heiro">Portfolio</h2>
         <div class="pfRule" aria-hidden="true"></div>
-        <nav class="pfNav">${navHtml}</nav>
       </div>
 
       <div class="pfBody">
@@ -840,6 +837,98 @@ function renderPortfolio(rows, sectionImages) {
       </div>
     </div>
   `;
+
+  initPortfolioAccordion(root);
+}
+
+function initPortfolioAccordion(root) {
+  const reduce =
+    window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const accs = Array.from(root.querySelectorAll(".pfAcc"));
+  if (!accs.length) return;
+
+  function setPanelHeight(acc, open) {
+    const panel = acc.querySelector(".pfAccPanel");
+    const body = acc.querySelector(".pfAccBody");
+    if (!panel || !body) return;
+
+    if (reduce) {
+      panel.style.maxHeight = open ? "none" : "0px";
+      return;
+    }
+
+    if (open) {
+      panel.style.maxHeight = body.scrollHeight + "px";
+    } else {
+      panel.style.maxHeight = body.scrollHeight + "px";
+      requestAnimationFrame(() => {
+        panel.style.maxHeight = "0px";
+      });
+    }
+  }
+
+  function refreshAcc(acc) {
+    if (!acc.classList.contains("isOpen")) return;
+    const panel = acc.querySelector(".pfAccPanel");
+    const body = acc.querySelector(".pfAccBody");
+    if (!panel || !body) return;
+    if (reduce) return;
+    panel.style.maxHeight = body.scrollHeight + "px";
+  }
+
+  function snapToAcc(acc) {
+    const head = acc.querySelector(".pfAccHead");
+    if (!head) return;
+
+    const rect = head.getBoundingClientRect();
+    const targetTop = window.scrollY + rect.top - 18;
+    const dist = Math.abs(window.scrollY - targetTop);
+    if (dist < 40) return;
+
+    window.scrollTo({
+      top: targetTop,
+      behavior: reduce ? "auto" : "smooth",
+    });
+  }
+
+  function openAcc(acc) {
+    const head = acc.querySelector(".pfAccHead");
+    acc.classList.add("isOpen");
+    if (head) head.setAttribute("aria-expanded", "true");
+    setPanelHeight(acc, true);
+    snapToAcc(acc);
+  }
+
+  function closeAcc(acc) {
+    const head = acc.querySelector(".pfAccHead");
+    acc.classList.remove("isOpen");
+    if (head) head.setAttribute("aria-expanded", "false");
+    setPanelHeight(acc, false);
+  }
+
+  accs.forEach((acc) => {
+    const head = acc.querySelector(".pfAccHead");
+    const open = acc.classList.contains("isOpen");
+    if (head) head.setAttribute("aria-expanded", open ? "true" : "false");
+    setPanelHeight(acc, open);
+
+    acc.querySelectorAll(".pfAccBody img").forEach((img) => {
+      if (img.complete) return;
+      img.addEventListener("load", () => refreshAcc(acc), { once: true });
+    });
+  });
+
+  root.addEventListener("click", (e) => {
+    const head = e.target.closest(".pfAccHead");
+    if (!head) return;
+
+    const acc = head.closest(".pfAcc");
+    if (!acc) return;
+
+    if (acc.classList.contains("isOpen")) closeAcc(acc);
+    else openAcc(acc);
+  });
 }
 
 function smoothScrollToTarget(target) {
@@ -909,6 +998,81 @@ function getYouTubeThumb(url) {
   const id = getYouTubeId(url);
   if (!id) return "";
   return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+}
+
+// ===== Collab Video Modal (body attach) =====
+function ensureCollabVideoModal() {
+  let modal = document.getElementById("ytModal");
+  if (modal) return modal;
+
+  modal = document.createElement("div");
+  modal.className = "ytModal";
+  modal.id = "ytModal";
+  modal.setAttribute("aria-hidden", "true");
+
+  modal.innerHTML = `
+    <button class="ytModalBg" type="button" data-close="1" aria-label="close"></button>
+
+    <div class="ytModalBox" role="dialog" aria-modal="true" aria-label="YouTube player">
+      <button class="ytModalClose" type="button" data-close="1" aria-label="close">×</button>
+
+      <div class="ytFrame">
+        <iframe
+          class="ytIframe"
+          src=""
+          title="YouTube video player"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+        ></iframe>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+  return modal;
+}
+
+function openCollabVideoModal(youtubeUrl) {
+  const id = getYouTubeId(youtubeUrl);
+  if (!id) {
+    window.open(youtubeUrl, "_blank", "noopener");
+    return;
+  }
+
+  const modal = ensureCollabVideoModal();
+  const iframe = modal.querySelector(".ytIframe");
+
+  iframe.setAttribute("src", `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`);
+
+  modal.classList.add("on");
+  modal.setAttribute("aria-hidden", "false");
+  document.documentElement.classList.add("isModalOpen");
+}
+
+function closeCollabVideoModal() {
+  const modal = document.getElementById("ytModal");
+  if (!modal) return;
+
+  const iframe = modal.querySelector(".ytIframe");
+  modal.classList.remove("on");
+  modal.setAttribute("aria-hidden", "true");
+  iframe.setAttribute("src", "");
+
+  document.documentElement.classList.remove("isModalOpen");
+}
+
+function bindCollabVideoModalEventsOnce() {
+  if (window.__ytModalBound) return;
+  window.__ytModalBound = true;
+
+  document.addEventListener("click", (e) => {
+    if (e.target.closest("#ytModal [data-close]")) closeCollabVideoModal();
+  });
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeCollabVideoModal();
+  });
 }
 
 // =====================
@@ -1003,12 +1167,15 @@ function renderCollab(collabRows, sectionImages) {
     </div>
   `;
 
+  bindCollabVideoModalEventsOnce();
+
   root.querySelectorAll(".collabYtBtn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
+
       const url = btn.getAttribute("data-youtube") || "";
-      if (url) window.open(url, "_blank", "noopener");
+      if (url) openCollabVideoModal(url);
     });
   });
 }

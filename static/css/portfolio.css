@@ -4,64 +4,26 @@
   position: relative;
   overflow: clip;
 
-  --pf-cols: 3;
-  --pf-gap: 18px;
   --pf-wide-opacity: .08;
 }
 
-#portfolio::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  z-index: 1;
-  pointer-events:none;
-
-  background:
-    radial-gradient(720px 520px at 20% 18%,
-      rgba(255,255,255,1) 0%,
-      rgba(255,255,255,.92) 56%,
-      rgba(255,255,255,0) 78%
-    ),
-    linear-gradient(90deg,
-      rgba(255,255,255,1) 0%,
-      rgba(255,255,255,.90) 46%,
-      rgba(255,255,255,0) 72%
-    );
-}
-
 #portfolio .pfBgWide{
-  position: absolute;
-  inset: 0;
-  z-index: 2;
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1180px;
+  height: 100vh;
+  z-index: 0;
 
   background-repeat: no-repeat;
   background-size: cover;
-  background-position: -260px -220px;
+  background-position: center;
   opacity: var(--pf-wide-opacity);
 
   filter: blur(2px) saturate(.92) contrast(1.18);
   mix-blend-mode: multiply;
-
-  -webkit-mask-image:
-    linear-gradient(
-      to bottom,
-      rgba(0,0,0,1) 0%,
-      rgba(0,0,0,1) 70%,
-      rgba(0,0,0,.5) 82%,
-      rgba(0,0,0,0) 100%
-    );
-
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
-
-  mask-image:
-    linear-gradient(
-      to bottom,
-      rgba(0,0,0,1) 0%,
-      rgba(0,0,0,1) 70%,
-      rgba(0,0,0,.5) 82%,
-      rgba(0,0,0,0) 100%
-    );
+  pointer-events: none;
 }
 
 #portfolio .pfInner{
@@ -92,64 +54,93 @@
   background: rgba(40,50,56,.18);
 }
 
-#portfolio .pfNav{
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px 10px;
-}
-
-#portfolio .pfNavBtn{
-  display: inline-block;
-  padding: 7px 14px;
-  border: 1px solid rgba(40,50,56,.16);
-  background: rgba(255,255,255,.65);
-  color: #38565f;
-  font-size: 14px;
-  letter-spacing: .01em;
-  text-decoration: none;
-}
-
-#portfolio .pfNavBtn:hover{
-  background: rgba(255,255,255,.85);
-}
+/* -------------------- */
+/* Accordion Layout */
+/* -------------------- */
 
 #portfolio .pfBody{
   width: 980px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
-#portfolio .pfGroup + .pfGroup{
-  margin-top: 72px;
+#portfolio .pfAcc{
+  border: 1px solid rgba(40,50,56,.12);
+  background: rgba(255,255,255,.62);
+  box-shadow: 0 10px 26px rgba(0,0,0,.04);
 }
 
-#portfolio .pfGroupHead{
+#portfolio .pfAccHead{
+  width: 100%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  user-select: none;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 14px 16px;
   text-align: left;
-  margin-bottom: 18px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(40,50,56,.12);
 }
 
-#portfolio .pfGroupTitle{
-  margin: 0;
-  font-size: 20px;
+#portfolio .pfAccTitle{
+  font-size: 18px;
   font-weight: 500;
   color: #38565f;
   letter-spacing: .01em;
 }
 
-#portfolio .pfGroupRule{
-  display: none;
+#portfolio .pfAccMeta{
+  margin-left: auto;
+  font-size: 12px;
+  color: rgba(56,86,95,.75);
+  border: 1px solid rgba(40,50,56,.12);
+  padding: 3px 8px;
+  background: rgba(255,255,255,.55);
 }
 
-#portfolio .pfMasonry{
-  column-count: var(--pf-cols);
-  column-gap: var(--pf-gap);
+#portfolio .pfAccIcon{
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid rgba(56,86,95,.8);
+  border-bottom: 2px solid rgba(56,86,95,.8);
+  transform: rotate(-45deg);
+  transition: transform .22s ease;
 }
 
-#portfolio .pfCard{
-  break-inside: avoid;
-  margin: 0 0 var(--pf-gap);
+#portfolio .pfAcc.isOpen .pfAccIcon{
+  transform: rotate(45deg);
+}
+
+#portfolio .pfAccPanel{
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height .42s cubic-bezier(.22,.61,.36,1);
+  border-top: 1px solid rgba(40,50,56,.10);
+}
+
+#portfolio .pfAccBody{
+  padding: 18px 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity .22s ease, transform .22s ease;
+}
+
+#portfolio .pfAcc.isOpen .pfAccBody{
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#portfolio .pfRow{
+  margin: 0;
 }
 
 #portfolio .pfBtn{
@@ -166,9 +157,9 @@
   height: auto;
   display: block;
 
-  background: rgba(255,255,255,.7);
-  box-shadow: 0 8px 26px rgba(0,0,0,.08);
+  background: rgba(255,255,255,.78);
   border: 1px solid rgba(40,50,56,.10);
+  box-shadow: 0 12px 30px rgba(0,0,0,.08);
 
   transition: transform .22s ease, filter .22s ease;
 }
@@ -177,6 +168,10 @@
   transform: translateY(-2px);
   filter: brightness(1.02);
 }
+
+/* -------------------- */
+/* Modal (body attach) */
+/* -------------------- */
 
 .pfModal{
   position: fixed;
