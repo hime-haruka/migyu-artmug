@@ -371,8 +371,11 @@
 }
 
 .ytModal{
-  position: fixed;
-  inset: 0;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--syura-parent-viewport-top, 0px);
+  height: var(--syura-parent-viewport-height, 100vh);
   z-index: 9999;
   display: none;
 }
@@ -505,4 +508,11 @@
   background: rgba(255,255,255,.72);
   display: grid;
   place-items: center;
+}
+
+@media (max-width: 720px){
+  .ytModalBox{
+    width: calc(100vw - 28px);
+    max-height: calc(var(--syura-parent-viewport-height, 100vh) - 28px);
+  }
 }

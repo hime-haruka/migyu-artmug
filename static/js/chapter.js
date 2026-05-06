@@ -75,12 +75,14 @@ function setPanelHeight(panel, open) {
     const onEnd = (e) => {
       if (e.target !== panel || e.propertyName !== "height") return;
       panel.style.height = "auto";
+      window.SyuraIframe?.reportHeight?.();
       panel.removeEventListener("transitionend", onEnd);
     };
     panel.addEventListener("transitionend", onEnd);
   } else {
     requestAnimationFrame(() => {
       panel.style.height = "0px";
+      window.SyuraIframe?.reportHeight?.();
     });
   }
 }
@@ -180,6 +182,7 @@ function renderChapters(sectionImages) {
 
     if (reduce) {
       panel.style.height = willOpen ? "auto" : "0px";
+      window.SyuraIframe?.reportHeight?.();
       return;
     }
 
@@ -187,6 +190,9 @@ function renderChapters(sectionImages) {
 
     requestAnimationFrame(() => {
       playFLIP(toc, first, 520);
+      window.SyuraIframe?.reportHeight?.();
+      setTimeout(() => window.SyuraIframe?.reportHeight?.(), 420);
+      setTimeout(() => window.SyuraIframe?.reportHeight?.(), 700);
     });
   });
 

@@ -32,6 +32,27 @@ function nl2brHtml(plainText) {
   return escapeHtml(plainText).replace(/\n/g, "<br>");
 }
 
+function withImageWidth(url, width = 1400) {
+  const u = String(url || '').trim();
+  if (!u) return '';
+  if (/^https:\/\/lh3\.googleusercontent\.com\/d\//.test(u) && !/[?=]w\d+/.test(u)) {
+    return `${u}=w${Number(width) || 1400}`;
+  }
+  return u;
+}
+
+function imageAttrs(priority = false) {
+  return priority
+    ? 'loading="eager" decoding="async" fetchpriority="high"'
+    : 'loading="lazy" decoding="async" fetchpriority="low"';
+}
+
+function refreshFrameSoon() {
+  window.SyuraIframe?.reportHeight?.();
+  setTimeout(() => window.SyuraIframe?.reportHeight?.(), 80);
+  setTimeout(() => window.SyuraIframe?.reportHeight?.(), 360);
+}
+
 function assertUtils() {
   const required = ["csvToObjects", "toDirectDriveImage", "toBool", "toNum", "sanitizeBasicHtml"];
   const missing = required.filter((k) => typeof window[k] !== "function");
@@ -52,7 +73,7 @@ async function loadIntro() {
   const first = rows[0] ?? { image_url: "", quote: "", desc: "" };
 
   return {
-    imageUrl: toDirectDriveImage(first.image_url),
+    imageUrl: withImageWidth(toDirectDriveImage(first.image_url), 1600),
     quote: first.quote ?? "",
     desc: first.desc ?? "",
   };
@@ -79,7 +100,7 @@ async function loadSectionImages() {
 
   return rows.map(r => ({
     sectionId: r.section_id?.trim(),
-    imageUrl: toDirectDriveImage(r.image_url ?? "")
+    imageUrl: withImageWidth(toDirectDriveImage(r.image_url ?? ""), 1600)
   }));
 }
 
@@ -115,7 +136,7 @@ function renderIntroWithPoints(intro, points, sectionImages) {
     <div class="introBgWide" style="background-image:url('${bgUrl}')"></div>
 
     <div class="introTopDeco">
-      <img src="./static/images/intro-top.png" alt="">
+      <img src="./static/images/intro-top.png" alt="" loading="eager" decoding="async" fetchpriority="high">
     </div>
 
     <section class="hero">
@@ -795,7 +816,7 @@ async function loadPortfolio() {
       groupOrder: toNum(r.group_order, 9999),
       group: (r.group ?? "").trim(),
       order: toNum(r.order, 9999),
-      imageUrl: toDirectDriveImage(r.image_url ?? ""),
+      imageUrl: withImageWidth(toDirectDriveImage(r.image_url ?? ""), 1600),
     }))
     .filter((x) => x.group && x.imageUrl)
     .sort((a, b) => a.groupOrder - b.groupOrder || a.order - b.order);
@@ -829,6 +850,9 @@ function openPortfolioModal(src, alt) {
 
   img.setAttribute("src", src);
   img.setAttribute("alt", alt || "");
+
+  window.SyuraIframe?.requestParentViewport?.();
+  window.SyuraIframe?.applyParentViewport?.();
 
   modal.classList.add("on");
   modal.setAttribute("aria-hidden", "false");
@@ -909,7 +933,7 @@ function renderPortfolio(rows, sectionImages) {
           return `
             <figure class="pfRow">
               <button class="pfBtn" type="button" data-full="${full}" aria-label="${alt}">
-                <img class="pfImg" src="${full}" alt="${alt}" loading="lazy" decoding="async">
+                <img class="pfImg" src="${full}" alt="${alt}" ${imageAttrs(idx === 0)} sizes="(max-width: 720px) 92vw, 720px">
               </button>
             </figure>
           `;
@@ -966,15 +990,18 @@ function initPortfolioAccordion(root) {
 
     if (reduce) {
       panel.style.maxHeight = open ? "none" : "0px";
+      refreshFrameSoon();
       return;
     }
 
     if (open) {
       panel.style.maxHeight = body.scrollHeight + "px";
+      refreshFrameSoon();
     } else {
       panel.style.maxHeight = body.scrollHeight + "px";
       requestAnimationFrame(() => {
         panel.style.maxHeight = "0px";
+        refreshFrameSoon();
       });
     }
   }
@@ -1026,7 +1053,7 @@ function initPortfolioAccordion(root) {
 
     acc.querySelectorAll(".pfAccBody img").forEach((img) => {
       if (img.complete) return;
-      img.addEventListener("load", () => refreshAcc(acc), { once: true });
+      img.addEventListener("load", () => { refreshAcc(acc); refreshFrameSoon(); }, { once: true });
     });
   });
 
@@ -1156,6 +1183,9 @@ function openCollabVideoModal(youtubeUrl) {
 
   iframe.setAttribute("src", `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`);
 
+  window.SyuraIframe?.requestParentViewport?.();
+  window.SyuraIframe?.applyParentViewport?.();
+
   modal.classList.add("on");
   modal.setAttribute("aria-hidden", "false");
   document.documentElement.classList.add("isModalOpen");
@@ -1242,7 +1272,7 @@ function renderCollab(collabRows, sectionImages) {
         <button class="collabVid" type="button" data-youtube="${escapeHtml(url)}">
           <span class="collabVidMedia">
             ${thumb
-              ? `<img class="collabVidThumb" src="${escapeHtml(thumb)}" alt="">`
+              ? `<img class="collabVidThumb" src="${escapeHtml(thumb)}" alt="" loading="lazy" decoding="async" fetchpriority="low">`
               : `<span class="collabVidThumb collabVidThumb--empty"></span>`
             }
             <span class="collabVidShade" aria-hidden="true"></span>
@@ -1316,6 +1346,7 @@ function renderCollab(collabRows, sectionImages) {
     const head = item.querySelector(".collabHead");
     head?.setAttribute("aria-expanded", "false");
     item.classList.remove("is-open");
+    refreshFrameSoon();
   };
 
   const openItem = (item) => {
@@ -1323,6 +1354,7 @@ function renderCollab(collabRows, sectionImages) {
     head?.setAttribute("aria-expanded", "true");
     item.classList.add("is-open");
     setupCollabSliders(item);
+    refreshFrameSoon();
   };
 
   items.forEach((item) => {
@@ -1629,6 +1661,8 @@ function renderGuide(guides, refunds, sectionImages) {
   renderChapters(sectionImages);
 
   enableSmoothAnchors();
+  refreshFrameSoon();
+  window.SyuraIframe?.requestParentViewport?.();
   
   } catch (err) {
     console.error(err);
